@@ -1,0 +1,217 @@
+{
+  "info": {
+    "name": "Notes API — A5",
+    "description": "Paginated, filtered, validated REST API for managing notes. Base URL: http://localhost:3000/v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/v1" }
+  ],
+  "item": [
+    {
+      "name": "Create a note",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/notes", "host": ["{{baseUrl}}"], "path": ["notes"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Follow up with the design team about the onboarding flow mockups\",\n  \"completed\": false\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "201 Created",
+          "originalRequest": { "method": "POST", "url": "{{baseUrl}}/notes" },
+          "status": "Created",
+          "code": 201,
+          "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"text\": \"Follow up with the design team about the onboarding flow mockups\",\n    \"completed\": false,\n    \"createdAt\": \"2026-09-15T11:34:29.011Z\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "List notes (default pagination)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/notes", "host": ["{{baseUrl}}"], "path": ["notes"] }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": [\n    { \"id\": 1, \"text\": \"Follow up with the design team about the onboarding flow mockups\", \"completed\": false, \"createdAt\": \"2026-09-15T11:34:29.011Z\" }\n  ],\n  \"pagination\": { \"page\": 1, \"limit\": 10, \"total\": 1, \"totalPages\": 1 }\n}"
+        }
+      ]
+    },
+    {
+      "name": "List notes (page + limit)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notes?page=2&limit=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["notes"],
+          "query": [
+            { "key": "page", "value": "2" },
+            { "key": "limit", "value": "5" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK — second page",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes?page=2&limit=5" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": [\n    { \"id\": 6, \"text\": \"Renew the domain before it expires next week\", \"completed\": false, \"createdAt\": \"2026-09-15T11:35:02.100Z\" }\n  ],\n  \"pagination\": { \"page\": 2, \"limit\": 5, \"total\": 6, \"totalPages\": 2 }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Filter notes by completed status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notes?completed=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["notes"],
+          "query": [{ "key": "completed", "value": "true" }]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK — only completed notes",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes?completed=true" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": [\n    { \"id\": 3, \"text\": \"Book the conference room for Thursday's retro\", \"completed\": true, \"createdAt\": \"2026-09-15T11:34:50.200Z\" }\n  ],\n  \"pagination\": { \"page\": 1, \"limit\": 10, \"total\": 1, \"totalPages\": 1 }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Filter notes by text search",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notes?search=conference",
+          "host": ["{{baseUrl}}"],
+          "path": ["notes"],
+          "query": [{ "key": "search", "value": "conference" }]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK — text search match",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes?search=conference" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": [\n    { \"id\": 3, \"text\": \"Book the conference room for Thursday's retro\", \"completed\": true, \"createdAt\": \"2026-09-15T11:34:50.200Z\" }\n  ],\n  \"pagination\": { \"page\": 1, \"limit\": 10, \"total\": 1, \"totalPages\": 1 }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get one note by id",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/notes/1", "host": ["{{baseUrl}}"], "path": ["notes", "1"] }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes/1" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": { \"id\": 1, \"text\": \"Follow up with the design team about the onboarding flow mockups\", \"completed\": false, \"createdAt\": \"2026-09-15T11:34:29.011Z\" }\n}"
+        },
+        {
+          "name": "404 Not Found",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes/999" },
+          "status": "Not Found",
+          "code": 404,
+          "body": "{\n  \"error\": { \"message\": \"Note with id 999 not found\", \"code\": \"NotFoundError\" }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Update a note",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/notes/1", "host": ["{{baseUrl}}"], "path": ["notes", "1"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"completed\": true\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "PUT", "url": "{{baseUrl}}/notes/1" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": { \"id\": 1, \"text\": \"Follow up with the design team about the onboarding flow mockups\", \"completed\": true, \"createdAt\": \"2026-09-15T11:34:29.011Z\" }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete a note",
+      "request": {
+        "method": "DELETE",
+        "url": { "raw": "{{baseUrl}}/notes/1", "host": ["{{baseUrl}}"], "path": ["notes", "1"] }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "DELETE", "url": "{{baseUrl}}/notes/1" },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"data\": { \"id\": 1, \"text\": \"Follow up with the design team about the onboarding flow mockups\", \"completed\": true, \"createdAt\": \"2026-09-15T11:34:29.011Z\" }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Validation error example — empty text",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/notes", "host": ["{{baseUrl}}"], "path": ["notes"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "400 Bad Request — documents the error envelope shape",
+          "originalRequest": { "method": "POST", "url": "{{baseUrl}}/notes" },
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"error\": {\n    \"message\": \"Validation failed\",\n    \"code\": \"ValidationError\",\n    \"details\": [\n      { \"code\": \"too_small\", \"path\": [\"text\"], \"message\": \"text is required\" }\n    ]\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Invalid pagination example — negative page",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notes?page=-1",
+          "host": ["{{baseUrl}}"],
+          "path": ["notes"],
+          "query": [{ "key": "page", "value": "-1" }]
+        }
+      },
+      "response": [
+        {
+          "name": "400 Bad Request",
+          "originalRequest": { "method": "GET", "url": "{{baseUrl}}/notes?page=-1" },
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"error\": {\n    \"message\": \"Invalid pagination parameters\",\n    \"code\": \"ValidationError\",\n    \"details\": [\n      { \"code\": \"custom\", \"path\": [\"page\"], \"message\": \"page must be a positive integer\" }\n    ]\n  }\n}"
+        }
+      ]
+    }
+  ]
+}
